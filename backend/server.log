@@ -1,0 +1,12 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.30.0.2:5000
+[33mPress CTRL+C to quit[0m
+/workspace/backend/app.py:51: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  created_at = datetime.utcnow().isoformat() + "Z"
+New report received: id=1, title='Overflowing bin', description='Trash bin full at park', location='Riverside Park', category='Trash'
+127.0.0.1 - - [31/Aug/2025 18:43:17] "POST /report HTTP/1.1" 200 -
+127.0.0.1 - - [31/Aug/2025 18:43:19] "GET /reports?category=Trash HTTP/1.1" 200 -

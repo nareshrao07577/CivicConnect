@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports Dashboard</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }
+      header { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+      select, input[type="search"] { padding: 0.4rem 0.5rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+      button { padding: 0.5rem 0.9rem; border: none; border-radius: 6px; background: #2563eb; color: #fff; font-size: 0.95rem; cursor: pointer; }
+      table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+      th, td { text-align: left; padding: 0.6rem; border-bottom: 1px solid #eee; vertical-align: top; }
+      th { background: #f8fafc; font-weight: 700; }
+      .muted { color: #6b7280; font-size: 0.9rem; }
+      .pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 0.8rem; }
+      .controls { margin-top: 0.5rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Reports Dashboard</h1>
+    <header>
+      <label>
+        Category
+        <select id="filter-category">
+          <option value="all" selected>All</option>
+          <option value="Pothole">Pothole</option>
+          <option value="Streetlight">Streetlight</option>
+          <option value="Trash">Trash</option>
+          <option value="Graffiti">Graffiti</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+      <label>
+        Search
+        <input id="filter-q" type="search" placeholder="title, description, location" />
+      </label>
+      <button id="refresh">Refresh</button>
+      <span id="count" class="muted"></span>
+    </header>
+
+    <div class="controls">
+      <a href="./index.html">Submit another report</a>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Location</th>
+          <th>Category</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+
+    <script>
+      const tbody = document.getElementById('tbody');
+      const countEl = document.getElementById('count');
+      const categoryEl = document.getElementById('filter-category');
+      const qEl = document.getElementById('filter-q');
+      const refreshBtn = document.getElementById('refresh');
+
+      async function loadReports() {
+        const params = new URLSearchParams();
+        const category = categoryEl.value;
+        const q = qEl.value.trim();
+        if (category && category !== 'all') params.set('category', category);
+        if (q) params.set('q', q);
+        const url = `http://localhost:5000/reports${params.toString() ? '?' + params.toString() : ''}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          tbody.innerHTML = `<tr><td colspan="6">Failed to load: ${res.status}</td></tr>`;
+          return;
+        }
+        const data = await res.json();
+        countEl.textContent = `${data.count} report${data.count === 1 ? '' : 's'}`;
+        tbody.innerHTML = data.items.map(r => `
+          <tr>
+            <td>${r.id}</td>
+            <td>${escapeHtml(r.title)}</td>
+            <td>${escapeHtml(r.description)}</td>
+            <td>${escapeHtml(r.location)}</td>
+            <td><span class="pill">${escapeHtml(r.category)}</span></td>
+            <td class="muted">${new Date(r.created_at).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      refreshBtn.addEventListener('click', loadReports);
+      categoryEl.addEventListener('change', loadReports);
+      qEl.addEventListener('input', () => {
+        // debounce
+        clearTimeout(window.__qTimer);
+        window.__qTimer = setTimeout(loadReports, 300);
+      });
+
+      loadReports();
+    </script>
+  </body>
+  </html>
+

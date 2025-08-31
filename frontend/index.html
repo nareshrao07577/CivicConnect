@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Civic Issue Reporter</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }
+      form { max-width: 480px; display: grid; gap: 0.75rem; }
+      label { font-weight: 600; }
+      input[type="text"], textarea { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+      textarea { resize: vertical; min-height: 100px; }
+      button { padding: 0.6rem 1rem; border: none; border-radius: 6px; background: #2563eb; color: #fff; font-size: 1rem; cursor: pointer; }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .status { margin-top: 1rem; min-height: 1.25rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Report an Issue</h1>
+    <form id="report-form">
+      <div>
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" required />
+      </div>
+      <div>
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required></textarea>
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input id="location" name="location" type="text" required />
+      </div>
+      <div>
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+          <option value="Pothole">Pothole</option>
+          <option value="Streetlight">Streetlight</option>
+          <option value="Trash">Trash</option>
+          <option value="Graffiti">Graffiti</option>
+          <option value="Other" selected>Other</option>
+        </select>
+      </div>
+      <button type="submit">Submit Report</button>
+      <div class="status" id="status"></div>
+    </form>
+
+    <script>
+      const form = document.getElementById('report-form');
+      const statusEl = document.getElementById('status');
+      const submitBtn = form.querySelector('button[type="submit"]');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        statusEl.textContent = '';
+        submitBtn.disabled = true;
+
+        const payload = {
+          title: document.getElementById('title').value.trim(),
+          description: document.getElementById('description').value.trim(),
+          location: document.getElementById('location').value.trim(),
+          category: document.getElementById('category').value
+        };
+
+        try {
+          const response = await fetch('http://localhost:5000/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || `Request failed with ${response.status}`);
+          }
+
+          const data = await response.json();
+          statusEl.textContent = data.status === 'received' ? `Report #${data.id} submitted successfully.` : 'Submitted.';
+          form.reset();
+          document.getElementById('category').value = 'Other';
+        } catch (err) {
+          statusEl.textContent = `Error: ${err.message}`;
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+  </html>
+
