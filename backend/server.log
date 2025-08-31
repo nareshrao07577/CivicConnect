@@ -1,0 +1,9 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.30.0.2:5000
+[33mPress CTRL+C to quit[0m
+New report received: title='Pothole', description='Large pothole on 5th Ave', location='5th Ave & Main'
+127.0.0.1 - - [31/Aug/2025 18:38:49] "POST /report HTTP/1.1" 200 -
