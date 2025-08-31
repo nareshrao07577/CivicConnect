@@ -30,6 +30,16 @@
         <label for="location">Location</label>
         <input id="location" name="location" type="text" required />
       </div>
+      <div>
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+          <option value="Pothole">Pothole</option>
+          <option value="Streetlight">Streetlight</option>
+          <option value="Trash">Trash</option>
+          <option value="Graffiti">Graffiti</option>
+          <option value="Other" selected>Other</option>
+        </select>
+      </div>
       <button type="submit">Submit Report</button>
       <div class="status" id="status"></div>
     </form>
@@ -47,7 +57,8 @@
         const payload = {
           title: document.getElementById('title').value.trim(),
           description: document.getElementById('description').value.trim(),
-          location: document.getElementById('location').value.trim()
+          location: document.getElementById('location').value.trim(),
+          category: document.getElementById('category').value
         };
 
         try {
@@ -63,8 +74,9 @@
           }
 
           const data = await response.json();
-          statusEl.textContent = data.status === 'received' ? 'Report submitted successfully.' : 'Submitted.';
+          statusEl.textContent = data.status === 'received' ? `Report #${data.id} submitted successfully.` : 'Submitted.';
           form.reset();
+          document.getElementById('category').value = 'Other';
         } catch (err) {
           statusEl.textContent = `Error: ${err.message}`;
         } finally {

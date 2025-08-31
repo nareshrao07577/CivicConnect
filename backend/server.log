@@ -5,5 +5,8 @@
  * Running on http://127.0.0.1:5000
  * Running on http://172.30.0.2:5000
 [33mPress CTRL+C to quit[0m
-New report received: title='Pothole', description='Large pothole on 5th Ave', location='5th Ave & Main'
-127.0.0.1 - - [31/Aug/2025 18:38:49] "POST /report HTTP/1.1" 200 -
+/workspace/backend/app.py:51: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  created_at = datetime.utcnow().isoformat() + "Z"
+New report received: id=1, title='Overflowing bin', description='Trash bin full at park', location='Riverside Park', category='Trash'
+127.0.0.1 - - [31/Aug/2025 18:43:17] "POST /report HTTP/1.1" 200 -
+127.0.0.1 - - [31/Aug/2025 18:43:19] "GET /reports?category=Trash HTTP/1.1" 200 -
